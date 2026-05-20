@@ -10,7 +10,13 @@ import { login } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -33,14 +39,20 @@ export default function LoginPage() {
     try {
       setIsLoading(true);
 
-      await login(email, password);
+      const loginData = await login(email, password);
+      const userId = loginData.user?.id;
+
+      if (!userId) {
+        throw new Error("User tidak ditemukan setelah login");
+      }
 
       const supabase = createClient();
 
       const { data: profile, error: profileError } = await supabase
         .from("user")
         .select("couple_id")
-        .single();
+        .eq("id", userId)
+        .maybeSingle();
 
       if (profileError) {
         throw profileError;
@@ -63,7 +75,6 @@ export default function LoginPage() {
       setIsLoading(false);
     }
   }
-
   return (
     <Card className="rounded-3xl border-none shadow-sm">
       <CardHeader className="space-y-3 text-center">
@@ -114,14 +125,21 @@ export default function LoginPage() {
             </Link>
           </div>
 
-          <Button type="submit" className="w-full rounded-2xl" disabled={isLoading}>
+          <Button
+            type="submit"
+            className="w-full rounded-2xl"
+            disabled={isLoading}
+          >
             {isLoading ? "Masuk..." : "Masuk"}
           </Button>
         </form>
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
           Belum punya akun?{" "}
-          <Link href="/register" className="font-medium text-primary hover:underline">
+          <Link
+            href="/register"
+            className="font-medium text-primary hover:underline"
+          >
             Daftar
           </Link>
         </p>
