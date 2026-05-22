@@ -5,9 +5,8 @@ import {
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
-import { Toaster } from "react-hot-toast";
 
-export function Providers({
+export function QueryProvider({
   children,
 }: {
   children: React.ReactNode;
@@ -29,7 +28,6 @@ export function Providers({
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      <Toaster position="top-center" />
     </QueryClientProvider>
   );
 }
